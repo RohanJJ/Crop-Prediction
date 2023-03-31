@@ -2,10 +2,10 @@
 #include <ESPHTTPClient.h>
 #include <JsonListener.h>
 
-// time
-#include <time.h>                       // time() ctime()
-#include <sys/time.h>                   // struct timeval
-#include <coredecls.h>                  // settimeofday_cb()
+
+#include <time.h>                       
+#include <sys/time.h>                   
+#include <coredecls.h>                  
 
 #include "SSD1306Wire.h"
 #include "OLEDDisplayUi.h"
@@ -18,43 +18,37 @@
 
 #include <Adafruit_BMP085.h>
 
-/***************************
- * WIFI Settings
- **************************/
+
 const char* WIFI_SSID = "HFT";
 const char* WIFI_PWD = "13874029516";
 
-/***************************
- * Begin DHT11 Settings
- **************************/
+
 WiFiClient client;
-const char *host = "api.thingspeak.com";                  //IP address of the thingspeak server
-const char *api_key ="6F21LYFFCYATUDUS";                  //Your own thingspeak api_key
+const char *host = "api.thingspeak.com";                  
+const char *api_key ="6F21LYFFCYATUDUS";                  
 const int httpPort = 80;
-#define pin 14       // ESP8266-12E  D5 read emperature and Humidity data
-int temp = 0; //temperature
-int humi = 0; //humidity
+#define pin 14       
+int temp = 0; 
+int humi = 0; 
 void readTemperatureHumidity();
 void uploadTemperatureHumidity();
 long readTime = 0; 
 long uploadTime = 0; 
 
-/***************************
- * Begin Atmosphere and Light Sensor Settings
- **************************/
+
 void readLight();
 void readAtmosphere();
 Adafruit_BMP085 bmp;
-const int Light_ADDR = 0b0100011;   // address:0x23
-const int Atom_ADDR = 0b1110111;  // address:0x77
+const int Light_ADDR = 0b0100011;   
+const int Atom_ADDR = 0b1110111;  
 int tempLight = 0;
 int tempAtom = 0;
 
 /***************************
  * Begin Settings
  **************************/
-#define TZ              2       // (utc+) TZ in hours
-#define DST_MN          60      // use 60mn for summer time in some countries
+#define TZ              2      
+#define DST_MN          60      
 
 // Setup
 const int UPDATE_INTERVAL_SECS = 20 * 60; // Update every 20 minutes
@@ -75,22 +69,12 @@ const int SDC_PIN = GPIO2
 #endif
 
 
-// OpenWeatherMap Settings
-// Sign up here to get an API key:
-// https://docs.thingpulse.com/how-tos/openweathermap-key/
+
 const boolean IS_METRIC = true;
 // Add your own thingpulse ID 
 String OPEN_WEATHER_MAP_APP_ID = "ed121a12e29d5b9d0e15a68de9a6f88e";
 String OPEN_WEATHER_MAP_LOCATION = "Zurich,CH";
 
-// Pick a language code from this list:
-// Arabic - ar, Bulgarian - bg, Catalan - ca, Czech - cz, German - de, Greek - el,
-// English - en, Persian (Farsi) - fa, Finnish - fi, French - fr, Galician - gl,
-// Croatian - hr, Hungarian - hu, Italian - it, Japanese - ja, Korean - kr,
-// Latvian - la, Lithuanian - lt, Macedonian - mk, Dutch - nl, Polish - pl,
-// Portuguese - pt, Romanian - ro, Russian - ru, Swedish - se, Slovak - sk,
-// Slovenian - sl, Spanish - es, Turkish - tr, Ukrainian - ua, Vietnamese - vi,
-// Chinese Simplified - zh_cn, Chinese Traditional - zh_tw.
 
 String OPEN_WEATHER_MAP_LANGUAGE = "en";
 const uint8_t MAX_FORECASTS = 4;
@@ -99,9 +83,7 @@ const uint8_t MAX_FORECASTS = 4;
 const String WDAY_NAMES[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 const String MONTH_NAMES[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
-/***************************
- * End Settings
- **************************/
+
  // Initialize the oled display for address 0x3c
  SSD1306Wire     display(I2C_DISPLAY_ADDRESS, SDA_PIN, SDC_PIN);
  OLEDDisplayUi   ui( &display );
@@ -132,9 +114,7 @@ void drawHeaderOverlay(OLEDDisplay *display, OLEDDisplayUiState* state);
 void setReadyForWeatherUpdate();
 
 
-// Add frames
-// this array keeps function pointers to all frames
-// frames are the single views that slide from right to left
+
 FrameCallback frames[] = { drawDateTime, drawCurrentWeather, drawForecast };
 int numberOfFrames = 3;
 
