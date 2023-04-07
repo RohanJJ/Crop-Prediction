@@ -44,9 +44,7 @@ const int Atom_ADDR = 0b1110111;
 int tempLight = 0;
 int tempAtom = 0;
 
-/***************************
- * Begin Settings
- **************************/
+
 #define TZ              2      
 #define DST_MN          60      
 
@@ -71,7 +69,6 @@ const int SDC_PIN = GPIO2
 
 
 const boolean IS_METRIC = true;
-// Add your own thingpulse ID 
 String OPEN_WEATHER_MAP_APP_ID = "ed121a12e29d5b9d0e15a68de9a6f88e";
 String OPEN_WEATHER_MAP_LOCATION = "Zurich,CH";
 
@@ -79,7 +76,7 @@ String OPEN_WEATHER_MAP_LOCATION = "Zurich,CH";
 String OPEN_WEATHER_MAP_LANGUAGE = "en";
 const uint8_t MAX_FORECASTS = 4;
 
-// Adjust according to your language
+
 const String WDAY_NAMES[] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
 const String MONTH_NAMES[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
@@ -99,11 +96,9 @@ OpenWeatherMapForecast forecastClient;
 #define DST_SEC         ((DST_MN)*60)
 time_t now;
 
-// flag changed in the ticker function every 10 minutes
 bool readyForWeatherUpdate = false;
 String lastUpdate = "--";
 long timeSinceLastWUpdate = 0;
-//declaring prototypes
 void drawProgress(OLEDDisplay *display, int percentage, String label);
 void updateData(OLEDDisplay *display);
 void drawDateTime(OLEDDisplay *display, OLEDDisplayUiState* state, int16_t x, int16_t y);
@@ -165,22 +160,19 @@ void setup() {
 
     counter++;
   }
-  // Get time from network time service
+
   configTime(TZ_SEC, DST_SEC, "pool.ntp.org");
   ui.setTargetFPS(30);
   ui.setActiveSymbol(activeSymbole);
   ui.setInactiveSymbol(inactiveSymbole);
-  // You can change this to
-  // TOP, LEFT, BOTTOM, RIGHT
+
   ui.setIndicatorPosition(BOTTOM);
-  // Defines where the first frame is located in the bar.
+
   ui.setIndicatorDirection(LEFT_RIGHT);
-  // You can change the transition that is used
-  // SLIDE_LEFT, SLIDE_RIGHT, SLIDE_TOP, SLIDE_DOWN
+
   ui.setFrameAnimation(SLIDE_LEFT);
   ui.setFrames(frames, numberOfFrames);
   ui.setOverlays(overlays, numberOfOverlays);
-  // Inital UI takes care of initalising the display too.
   ui.init();
   Serial.println("");
   updateData(&display);
@@ -191,14 +183,12 @@ void setup() {
 }
 
 void loop() {  
-  //Read Temperature Humidity every 5 seconds
   if(millis() - readTime > 5000){
     readTemperatureHumidity();
     readLight();
     readAtmosphere();
     readTime = millis();
   }
-  //Upload Temperature Humidity every 60 seconds
   if(millis() - uploadTime > 60000){
     uploadTemperatureHumidity();
     uploadTime = millis();
@@ -216,9 +206,7 @@ void loop() {
   int remainingTimeBudget = ui.update();
 
   if (remainingTimeBudget > 0) {
-    // You can do some work here
-    // Don't do stuff if you are below your
-    // time budget.
+
     delay(remainingTimeBudget);
   }
 }
@@ -341,44 +329,32 @@ void readTemperatureHumidity(){
   unsigned long time1;
 bgn:
   delay(2000);
-  //Set interface mode 2 to: output
-  //Output low level 20ms (>18ms)
-  //Output high level 40μs
+
   pinMode(pin, OUTPUT);
   digitalWrite(pin, LOW);
   delay(20);
   digitalWrite(pin, HIGH);
   delayMicroseconds(40);
   digitalWrite(pin, LOW);
-  //Set interface mode 2: input
   pinMode(pin, INPUT);
-  //High level response signal
   loopCnt = 10000;
   while (digitalRead(pin) != HIGH){
     if (loopCnt-- == 0){
-      //If don't return to high level for a long time, output a prompt and start over
       Serial.println("HIGH");
       goto bgn;
     }
   }
-  //Low level response signal
   loopCnt = 30000;
   while (digitalRead(pin) != LOW){
     if (loopCnt-- == 0){
-      //If don't return low for a long time, output a prompt and start over
       Serial.println("LOW");
       goto bgn;
     }
   }
-  //Start reading the value of bit1-40
   for (int i = 0; i < 40; i++){
     while (digitalRead(pin) == LOW){}
-    //When the high level occurs, write down the time "time"
     time1 = micros();
     while (digitalRead(pin) == HIGH){}
-    //When there is a low level, write down the time and subtract the time just saved
-    //If the value obtained is greater than 50μs, it is ‘1’, otherwise it is ‘0’
-    //And save it in an array
     if (micros() - time1  > 50){
       chr[i] = 1;
     } else {
